@@ -7,38 +7,28 @@ from datetime import timedelta
 
 
 def home(request):
-
+    # Популярные услуги (по количеству записей)
     popular_services = Service.objects.annotate(
         appointment_count=Count('appointment')
     ).order_by('-appointment_count')[:5]
 
-
+    # Ближайшие филиалы
     nearest_branches = Branch.objects.all()[:8]
 
+    # Исправленная статистика МФЦ
+    branch_stats = {
+        'total_branches': Branch.objects.count(),
+        'total_services': Service.objects.count(),
+        'total_appointments': Appointment.objects.count()
+    }
 
-    branch_stats = Branch.objects.aggregate(
-        total_branches=Count('branch_id'),
-        avg_services=Avg('service__appointment__appointment_id'),
-        max_appointments=Max('service__appointment__appointment_id')
-    )
-
-
+    # Последние новости
     latest_news = News.objects.all().order_by('-created_at')[:3]
 
-
+    # Категории услуг
     categories = Category.objects.annotate(
         service_count=Count('service')
     ).filter(service_count__gt=0)
-
-
-    expensive_services = Service.objects.filter(
-        state_duty__gt=1000
-    ).order_by('-state_duty')[:5]
-
-
-    busy_branches = Branch.objects.annotate(
-        service_count=Count('service')
-    ).order_by('-service_count')[:5]
 
     context = {
         'popular_services': popular_services,
@@ -46,11 +36,8 @@ def home(request):
         'branch_stats': branch_stats,
         'latest_news': latest_news,
         'categories': categories,
-        'expensive_services': expensive_services,
-        'busy_branches': busy_branches,
     }
     return render(request, 'home.html', context)
-
 
 def search_services(request):
     query = request.GET.get('q', '')

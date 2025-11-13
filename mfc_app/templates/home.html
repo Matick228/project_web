@@ -143,15 +143,15 @@
                     <div class="row text-center">
                         <div class="col-4">
                             <div class="stat-number">{{ branch_stats.total_branches|default:"0" }}</div>
-                            <small class="text-muted">Филиалов</small>
+                            <small>Филиалов</small>
                         </div>
                         <div class="col-4">
-                            <div class="stat-number">{{ branch_stats.avg_services|floatformat:0|default:"0" }}</div>
-                            <small class="text-muted">Среднее кол-во услуг</small>
+                            <div class="stat-number">{{ branch_stats.total_services|default:"0" }}</div>
+                            <small>Услуг</small>
                         </div>
                         <div class="col-4">
-                            <div class="stat-number">{{ branch_stats.max_appointments|default:"0" }}</div>
-                            <small class="text-muted">Макс. записей</small>
+                            <div class="stat-number">{{ branch_stats.total_appointments|default:"0" }}</div>
+                            <small>Записей</small>
                         </div>
                     </div>
                 </div>

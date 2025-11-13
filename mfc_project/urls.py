@@ -15,8 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from mfc_app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home, name='home'),  # Главная страница
+    path('search/', views.search_services, name='search_services'),
+    path('service/<int:service_id>/', views.service_detail, name='service_detail'),
 ]
