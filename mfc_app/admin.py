@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from .models import Category, User, Branch, Status, Service, Appointment, FavoriteService
 
-# Inline модели для отображения внутри других
+
 class FavoriteServiceInline(admin.TabularInline):
     model = FavoriteService
     extra = 0
