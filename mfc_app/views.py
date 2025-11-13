@@ -1,9 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.db.models import Count, Q, Avg, Max, Min
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from .models import Service, Branch, Appointment, News, Category, ServiceStatistic
 from django.utils import timezone
 from datetime import timedelta
+from .forms import ServiceForm
 
 
 def home(request):
@@ -39,10 +41,10 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+
 def search_services(request):
     query = request.GET.get('q', '')
     if query:
-
         results = Service.objects.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         ).exclude(
@@ -60,17 +62,14 @@ def search_services(request):
 def service_detail(request, service_id):
     service = get_object_or_404(Service, service_id=service_id)
 
-
     recent_appointments = Appointment.objects.filter(
         service=service,
         desired_date__gte=timezone.now().date() - timedelta(days=30)
     )
 
-
     busy_days = recent_appointments.extra({
         'day': "EXTRACT(dow FROM desired_date)"
     }).values('day').annotate(count=Count('appointment_id'))
-
 
     stat, created = ServiceStatistic.objects.get_or_create(service=service)
     stat.view_count += 1
@@ -81,3 +80,66 @@ def service_detail(request, service_id):
         'busy_days': busy_days,
         'stat': stat
     })
+
+
+def service_list(request):
+    """Страница со списком всех услуг для управления"""
+    services = Service.objects.all().select_related('category').order_by('service_id')
+    return render(request, 'service_list.html', {'services': services})
+
+
+def service_add(request):
+    """Добавление новой услуги"""
+    if request.method == 'POST':
+        form = ServiceForm(request.POST)
+        if form.is_valid():
+            service = form.save()
+            # Создаем статистику для новой услуги
+            ServiceStatistic.objects.create(service=service)
+            messages.success(request, f'Услуга "{service.name}" успешно добавлена!')
+            return redirect('service_list')
+    else:
+        form = ServiceForm()
+
+    return render(request, 'service_form.html', {
+        'form': form,
+        'title': 'Добавление новой услуги',
+        'submit_text': 'Добавить услугу'
+    })
+
+
+def service_edit(request, service_id):
+    """Редактирование существующей услуги"""
+    service = get_object_or_404(Service, service_id=service_id)
+
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, instance=service)
+        if form.is_valid():
+            updated_service = form.save()
+            messages.success(request, f'Услуга "{updated_service.name}" успешно обновлена!')
+            return redirect('service_list')
+    else:
+        form = ServiceForm(instance=service)
+
+    return render(request, 'service_form.html', {
+        'form': form,
+        'title': f'Редактирование услуги: {service.name}',
+        'submit_text': 'Сохранить изменения'
+    })
+
+
+def service_delete(request, service_id):
+    """Удаление услуги"""
+    if request.method == 'POST':
+        service = get_object_or_404(Service, service_id=service_id)
+        service_name = service.name
+
+        # Удаляем связанную статистику
+        ServiceStatistic.objects.filter(service=service).delete()
+        # Удаляем саму услугу
+        service.delete()
+
+        messages.success(request, f'Услуга "{service_name}" успешно удалена!')
+        return redirect('service_list')
+    else:
+        return HttpResponseForbidden("Метод не разрешен")
