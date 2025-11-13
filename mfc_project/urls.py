@@ -20,7 +20,11 @@ from mfc_app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),  # Главная страница
+    path('', views.home, name='home'),
     path('search/', views.search_services, name='search_services'),
     path('service/<int:service_id>/', views.service_detail, name='service_detail'),
+    path('services/', views.service_list, name='service_list'),
+    path('service/add/', views.service_add, name='service_add'),
+    path('service/<int:service_id>/edit/', views.service_edit, name='service_edit'),
+    path('service/<int:service_id>/delete/', views.service_delete, name='service_delete'),
 ]
