@@ -105,3 +105,30 @@ class FavoriteService(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'service'], name='unique_user_service')
         ]
+
+
+class News(models.Model):
+    news_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=200, verbose_name='Заголовок')
+    content = models.TextField(verbose_name='Содержание')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+
+
+class ServiceStatistic(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Услуга')
+    view_count = models.IntegerField(default=0, verbose_name='Количество просмотров')
+    appointment_count = models.IntegerField(default=0, verbose_name='Количество записей')
+
+    def __str__(self):
+        return f"Статистика: {self.service.name}"
+
+    class Meta:
+        verbose_name = 'Статистика услуги'
+        verbose_name_plural = 'Статистика услуг'
