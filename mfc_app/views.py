@@ -30,12 +30,24 @@ def home(request):
         service_count=Count('service')
     ).filter(service_count__gt=0)
 
+
+    expensive_services = Service.objects.filter(
+        state_duty__gt=1000
+    ).order_by('-state_duty')[:5]
+
+
+    busy_branches = Branch.objects.annotate(
+        service_count=Count('service')
+    ).order_by('-service_count')[:5]
+
     context = {
         'popular_services': popular_services,
         'nearest_branches': nearest_branches,
         'branch_stats': branch_stats,
         'latest_news': latest_news,
         'categories': categories,
+        'expensive_services': expensive_services,
+        'busy_branches': busy_branches,
     }
     return render(request, 'home.html', context)
 
