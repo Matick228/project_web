@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МФЦ - Главная страница</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .widget {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .service-card {
+            transition: transform 0.2s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-building"></i> МФЦ Портал
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Виджет 1: Поиск услуг -->
+        <div class="widget">
+            <h3><i class="fas fa-search"></i> Быстрый поиск услуг</h3>
+            <form action="/search/" method="get">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Введите название услуги...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Найти
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <!-- Виджет 2: Популярные услуги -->
+            <div class="col-md-6">
+                <div class="widget">
+                    <h4><i class="fas fa-fire"></i> Популярные услуги</h4>
+                    <div class="list-group">
+                        {% for service in popular_services %}
+                        <a href="/service/{{ service.service_id }}/"
+                           class="list-group-item list-group-item-action service-card">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ service.name }}</h6>
+                                <small class="text-muted">{{ service.appointment_count }} записей</small>
+                            </div>
+                            <small class="text-muted">
+                                {% if service.category %}
+                                    {{ service.category.name }}
+                                {% else %}
+                                    Без категории
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item">Услуги пока не добавлены</div>
+                        {% endfor %}
+                    </div>
+                    <a href="#" class="btn btn-outline-primary btn-sm mt-2">Все услуги →</a>
+                </div>
+            </div>
+
+            <!-- Виджет 3: Статистика -->
+            <div class="col-md-6">
+                <div class="widget">
+                    <h4><i class="fas fa-chart-bar"></i> Статистика МФЦ</h4>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-number">{{ branch_stats.total_branches|default:"0" }}</div>
+                            <small>Филиалов</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ branch_stats.avg_services|floatformat:0|default:"0" }}</div>
+                            <small>Среднее кол-во услуг</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ branch_stats.max_appointments|default:"0" }}</div>
+                            <small>Макс. записей</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Виджет 4: Новости -->
+                <div class="widget">
+                    <h4><i class="fas fa-newspaper"></i> Последние новости</h4>
+                    {% for news in latest_news %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ news.title }}</h6>
+                            <p class="card-text">{{ news.content|truncatewords:15 }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <p class="card-text">Новости пока не добавлены</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="#" class="btn btn-outline-primary btn-sm">Все новости →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Виджет 5: Ближайшие отделения -->
+        <div class="widget">
+            <h4><i class="fas fa-map-marker-alt"></i> Ближайшие отделения</h4>
+            <div class="row">
+                {% for branch in nearest_branches %}
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ branch.name }}</h6>
+                            <p class="card-text small">{{ branch.address }}</p>
+                            <p class="card-text"><small class="text-muted">{{ branch.work_hours }}</small></p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>Филиалы пока не добавлены</p>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="#" class="btn btn-outline-primary btn-sm mt-2">Все отделения →</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
