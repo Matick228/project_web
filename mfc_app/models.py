@@ -15,7 +15,7 @@ class Category(models.Model):
 
 class User(AbstractUser):
     user_id = models.AutoField(primary_key=True)
-    email = models.EmailField(unique=True, verbose_name=_('Email адрес'))
+    email = models.EmailField(unique=True, verbose_name=_('Email почта'))
     phone = models.CharField(max_length=15, blank=True, null=True, verbose_name=_('Телефон'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата создания'))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Дата обновления'))
@@ -92,9 +92,9 @@ class Appointment(models.Model):
 
 class FavoriteService(models.Model):
     favorite_service_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Пользователь'))
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name=_('Услуга'))
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата добавления'))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Пользователь 123'))
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name=_('Услуга 1337'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата добавления вчера'))
 
     def __str__(self):
         return f"{self.user} -> {self.service}"

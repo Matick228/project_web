@@ -14,17 +14,14 @@ def home(request):
         appointment_count=Count('appointment')
     ).order_by('-appointment_count')[:5]
 
-    # Ближайшие филиалы
     nearest_branches = Branch.objects.all()[:8]
 
-    # Исправленная статистика МФЦ
     branch_stats = {
         'total_branches': Branch.objects.count(),
         'total_services': Service.objects.count(),
         'total_appointments': Appointment.objects.count()
     }
 
-    # Последние новости
     latest_news = News.objects.all().order_by('-created_at')[:3]
 
     # Категории услуг
@@ -97,7 +94,7 @@ def service_add(request):
             # Создаем статистику для новой услуги
             ServiceStatistic.objects.create(service=service)
             messages.success(request, f'Услуга "{service.name}" успешно добавлена!')
-            return redirect('service_list')
+            return redirect('service_detail', service_id=service.service_id) #вот тут я поменял ссылку, была сыылка на сдругую страницу
     else:
         form = ServiceForm()
 
@@ -109,7 +106,6 @@ def service_add(request):
 
 
 def service_edit(request, service_id):
-    """Редактирование существующей услуги"""
     service = get_object_or_404(Service, service_id=service_id)
 
     if request.method == 'POST':
@@ -117,7 +113,7 @@ def service_edit(request, service_id):
         if form.is_valid():
             updated_service = form.save()
             messages.success(request, f'Услуга "{updated_service.name}" успешно обновлена!')
-            return redirect('service_list')
+            return redirect('service_detail', service_id=updated_service.service_id) #здесь происходит перенаправление на service_detail
     else:
         form = ServiceForm(instance=service)
 

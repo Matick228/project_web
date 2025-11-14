@@ -52,7 +52,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
-    list_display = ('branch_id', 'name', 'address', 'phone', 'work_hours', 'display_photo', 'created_at')
+    list_display = ( 'name', 'branch_id', 'address', 'phone', 'work_hours', 'display_photo', 'created_at')
     list_display_links = ('branch_id', 'name')
     list_filter = ('created_at',)
     search_fields = ('name', 'address', 'phone')
