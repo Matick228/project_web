@@ -50,9 +50,15 @@ def search_services(request):
     else:
         results = Service.objects.none()
 
+
+    popular_services = Service.objects.annotate(
+        appointment_count=Count('appointment')
+    ).order_by('-appointment_count')[:3] #добавление популярных если результатов нет
+
     return render(request, 'search_results.html', {
         'results': results,
-        'query': query
+        'query': query,
+        'popular_services': popular_services
     })
 
 
